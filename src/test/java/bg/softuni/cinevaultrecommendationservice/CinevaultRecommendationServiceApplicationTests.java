@@ -1,4 +1,4 @@
-package bg.softuni.cinevault_recommendation_service;
+package bg.softuni.cinevaultrecommendationservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
