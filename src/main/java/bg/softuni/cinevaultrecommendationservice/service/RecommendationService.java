@@ -12,7 +12,7 @@ public interface RecommendationService {
 
     void generateRecommendations(RecommendationRequestDto request);
 
-    void regenerateRecommendations(UUID userId);
+    void regenerateRecommendations(RecommendationRequestDto request);
 
     void deleteRecommendations(UUID userId);
 

@@ -13,9 +13,12 @@ import java.util.UUID;
 @AllArgsConstructor
 
 public class RecommendationRequestDto {
-    @NotNull(message = "User ID is required.")
+    @NotNull
     private UUID userId;
-    @NotEmpty(message = "At least one watched movie is required.")
+    @NotEmpty
     @Valid
-    private List<MoviePreferenceDto> moviePreferences;
+    private List<MoviePreferenceDto> watchedMovies;
+    @NotEmpty
+    @Valid
+    private List<MovieDto> allMovies;
 }

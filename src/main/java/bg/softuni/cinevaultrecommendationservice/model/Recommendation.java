@@ -32,7 +32,7 @@ public class Recommendation {
     private String reason;
 
     @Min(1)
-    @Max(10)
+    @Max(100)
     private Integer score;
     private LocalDateTime createdOn;
 }
