@@ -30,7 +30,7 @@ public class RecommendationServiceImpl implements RecommendationService {
     @Override
     public List<RecommendationDto> getRecommendations(UUID userId) {
         return recommendationRepository.findByUserId(userId)
-                .stream()
+                       .stream()
                 .map(recommendationMapper::toDto)
                 .toList();
     }
@@ -52,7 +52,9 @@ public class RecommendationServiceImpl implements RecommendationService {
                                 request.getWatchedMovies()
                                         .stream()
                                         .noneMatch(w -> w.getMovieId().equals(movie.getMovieId())))
-                        .sorted(Comparator.comparing(MovieDto::getAverageRating).reversed())
+                        .sorted(
+                                Comparator.comparing(MovieDto::getAverageRating,
+                                        Comparator.nullsLast(Comparator.naturalOrder())).reversed())
                         .limit(5)
                         .toList();
 
@@ -61,14 +63,13 @@ public class RecommendationServiceImpl implements RecommendationService {
                             .stream()
                             .anyMatch(r -> r.getMovieId()
                                     .equals(similarMovie.getMovieId()));
-
                     if (alreadyAdded) {
                         continue;
                     }
                     Recommendation recommendation = Recommendation.builder()
                             .userId(request.getUserId())
                             .movieId(similarMovie.getMovieId())
-                            .score(calculateRecommendationScore(similarMovie.getAverageRating(), watchedMovie.getRating()))
+                            .score(calculateRecommendationScore(similarMovie, watchedMovie))
                             .reason("Because you highly rated " + watchedMovie.getGenre() + " movies.")
                             .createdOn(LocalDateTime.now())
                             .build();
@@ -93,12 +94,27 @@ public class RecommendationServiceImpl implements RecommendationService {
         }
         recommendationRepository.deleteAllByUserId(userId);
     }
-    private Integer calculateRecommendationScore(Double averageRating, Integer userRating) {
-        if (averageRating == null) {
-            averageRating = 0.0;
-        }
-        double score = averageRating * userRating;
+    private Integer calculateRecommendationScore(MovieDto movie, MoviePreferenceDto watchedMovie) {
 
-        return Math.min((int) Math.round(score), 100);
+        double score = 0;
+
+        // Same genre
+        if (movie.getGenre() == watchedMovie.getGenre()) {
+            score += 70;
+        }
+
+        // User really liked the watched movie
+        if (watchedMovie.getRating() >= 9) {
+            score += 15;
+        } else if (watchedMovie.getRating() >= 8) {
+            score += 10;
+        }
+
+        // Movie popularity
+        if (movie.getAverageRating() != null) {
+            score += movie.getAverageRating() * 2;
+        }
+
+        return (int) Math.min(score, 100);
     }
 }

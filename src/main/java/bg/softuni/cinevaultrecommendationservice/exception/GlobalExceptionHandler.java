@@ -23,6 +23,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleGeneralException(
             Exception exception) {
 
+        exception.printStackTrace();
+
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("Something went wrong");

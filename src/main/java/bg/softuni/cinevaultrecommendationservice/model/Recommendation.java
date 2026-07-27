@@ -22,15 +22,20 @@ import java.util.UUID;
 public class Recommendation {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(columnDefinition = "BINARY(16)")
+
     private UUID id;
 
     @NotNull
+    @Column(columnDefinition = "BINARY(16)")
     private UUID userId;
     @NotNull
+    @Column(columnDefinition = "BINARY(16)")
     private UUID movieId;
     @NotBlank
     private String reason;
 
+    @NotNull
     @Min(1)
     @Max(100)
     private Integer score;
