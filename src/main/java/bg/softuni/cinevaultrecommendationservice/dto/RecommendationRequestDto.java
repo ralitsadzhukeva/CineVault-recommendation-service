@@ -15,7 +15,6 @@ import java.util.UUID;
 public class RecommendationRequestDto {
     @NotNull
     private UUID userId;
-    @NotEmpty
     @Valid
     private List<MoviePreferenceDto> watchedMovies;
     @NotEmpty

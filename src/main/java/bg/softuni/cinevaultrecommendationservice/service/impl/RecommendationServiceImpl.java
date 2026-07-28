@@ -9,6 +9,7 @@ import bg.softuni.cinevaultrecommendationservice.mapper.RecommendationMapper;
 import bg.softuni.cinevaultrecommendationservice.model.Recommendation;
 import bg.softuni.cinevaultrecommendationservice.repository.RecommendationRepository;
 import bg.softuni.cinevaultrecommendationservice.service.RecommendationService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -17,6 +18,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class RecommendationServiceImpl implements RecommendationService {
     private final RecommendationRepository recommendationRepository;
@@ -30,7 +32,9 @@ public class RecommendationServiceImpl implements RecommendationService {
     @Override
     public List<RecommendationDto> getRecommendations(UUID userId) {
         return recommendationRepository.findByUserId(userId)
-                       .stream()
+                .stream()
+                .sorted(Comparator.comparing(Recommendation::getScore).reversed())
+                .limit(12)
                 .map(recommendationMapper::toDto)
                 .toList();
     }
@@ -38,6 +42,10 @@ public class RecommendationServiceImpl implements RecommendationService {
     @Override
     public void generateRecommendations(RecommendationRequestDto request) {
         recommendationRepository.deleteAllByUserId(request.getUserId());
+
+        if (request.getWatchedMovies() == null || request.getWatchedMovies().isEmpty()) {
+            return;
+        }
 
         List<Recommendation> recommendations = new ArrayList<>();
 
@@ -78,6 +86,7 @@ public class RecommendationServiceImpl implements RecommendationService {
             }
         }
         recommendationRepository.saveAll(recommendations);
+        log.info("Recommendations generated for user {}", request.getUserId());
     }
 
     @Override
@@ -85,6 +94,7 @@ public class RecommendationServiceImpl implements RecommendationService {
         recommendationRepository.deleteAllByUserId(request.getUserId());
 
         generateRecommendations(request);
+        log.info("Recommendations regenerated for user {}", request.getUserId());
     }
 
     @Override
@@ -93,6 +103,7 @@ public class RecommendationServiceImpl implements RecommendationService {
             throw new RecommendationNotFoundException(userId);
         }
         recommendationRepository.deleteAllByUserId(userId);
+        log.info("Recommendations deleted for user {}", userId);
     }
     private Integer calculateRecommendationScore(MovieDto movie, MoviePreferenceDto watchedMovie) {
 
