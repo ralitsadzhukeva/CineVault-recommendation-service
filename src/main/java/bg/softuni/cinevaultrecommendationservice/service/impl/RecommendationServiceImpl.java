@@ -91,8 +91,6 @@ public class RecommendationServiceImpl implements RecommendationService {
 
     @Override
     public void regenerateRecommendations(RecommendationRequestDto request) {
-        recommendationRepository.deleteAllByUserId(request.getUserId());
-
         generateRecommendations(request);
         log.info("Recommendations regenerated for user {}", request.getUserId());
     }
