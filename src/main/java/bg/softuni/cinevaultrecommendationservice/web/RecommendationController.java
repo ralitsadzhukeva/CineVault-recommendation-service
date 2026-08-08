@@ -32,6 +32,13 @@ public class RecommendationController {
         recommendationService.generateRecommendations(request);
     }
 
+    @PutMapping("/regenerate")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void regenerateRecommendations(@Valid @RequestBody RecommendationRequestDto request) {
+
+        recommendationService.regenerateRecommendations(request);
+    }
+
     @DeleteMapping("/user/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteRecommendations(@PathVariable UUID userId) {
